@@ -1,0 +1,5 @@
+[JACC]
+backend = "cuda"
+
+[miniBUDEJACC]
+backend = "jacc-threads"
