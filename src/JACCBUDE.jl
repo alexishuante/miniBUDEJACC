@@ -29,9 +29,9 @@ const Float32Max = typemax(Float32)
 
 function run(params::Params, deck::Deck) #_::DeviceWithRepr)
   #println("Using max $(Threads.nthreads()) threads")
-  if params.ppwi != DefaultPPWI
-    @warn "Threaded implementation only uses wgsize, the PPWI argument is ignored"
-  end
+  # if params.ppwi != DefaultPPWI
+  #   @warn "Threaded implementation only uses wgsize, the PPWI argument is ignored"
+  # end
 
   poses = size(deck.poses)[2]
   etotals = JACC.Array{Float32}(undef, poses)
@@ -74,6 +74,7 @@ end
   nligand::Int = length(ligand)
   nprotein::Int = length(protein)
 
+  # print numgroups
   #Threads.@threads for group = 1:numGroups (use a function instead)
   function kernel(group, protein, ligand, forcefield, poses, etotals)
 
@@ -191,7 +192,7 @@ end
       @inbounds etotals[ix] = etot[i] * Half
     end
   end
-  
+
   JACC.parallel_for(numGroups, kernel, protein, ligand, forcefield, poses, etotals) #numgroups (first variable) determines how many times the kernel function will be called in parallel
 end
 

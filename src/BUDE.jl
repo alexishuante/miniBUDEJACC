@@ -4,7 +4,7 @@ using Printf
 using Base: Float64, Float32, Int, Int32
 import Base.read
 
-const DefaultInterations = 8
+const DefaultInterations = 10
 const DefaultNPoses = 65536
 const RefNPoses = 65536
 const DefaultWGSize = 64
