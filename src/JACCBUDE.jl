@@ -33,32 +33,61 @@ function run(params::Params, deck::Deck) #_::DeviceWithRepr)
   #   @warn "Threaded implementation only uses wgsize, the PPWI argument is ignored"
   # end
 
-  poses = size(deck.poses)[2]
-  etotals = JACC.Array{Float32}(undef, poses)
+  #nposes::Int = size(deck.poses)[2]
+  #poses = size(deck.poses)[2]
+
+  protein = JACC.Array{Atom}(deck.protein)
+  ligand = JACC.Array{Atom}(deck.ligand)
+  forcefield = JACC.Array{FFParams}(deck.forcefield)
+  poses = JACC.Array{Float32,2}(deck.poses)
+  #etotals = JACC.Array{Float32}(undef, poses)
+
+  etotals = JACC.Array{Float32}(undef, size(deck.poses)[2])
+
 
   # warmup
   fasten_main(
     Val(convert(Int, params.wgsize)),
-    deck.protein,
-    deck.ligand,
-    deck.forcefield,
-    deck.poses,
+    protein,
+    ligand,
+    forcefield,
+    poses,
     etotals,
   )
 
   elapsed = @elapsed for _ = 1:params.iterations
     fasten_main(
       Val(convert(Int, params.wgsize)),
-      deck.protein,
-      deck.ligand,
-      deck.forcefield,
-      deck.poses,
+      protein,
+      ligand,
+      forcefield,
+      poses,
       etotals,
     )
   end
 
+  # # Use @time for timing
+  #   time_result = @timed begin
+  #     for _ = 1:params.iterations
+  #       fasten_main(
+  #         Val(convert(Int, params.wgsize)),
+  #         protein,
+  #         ligand,
+  #         forcefield,
+  #         poses,
+  #         etotals,
+  #       )
+  #     end
+  #   end
   
-  (etotals, elapsed, params.wgsize)
+  # elapsed = time_result.time
+
+  # Transfer etotals back to CPU
+  etotals_cpu = Array(etotals)
+
+  
+  #(etotals, elapsed, params.wgsize)
+  (etotals_cpu, elapsed, params.wgsize)
 end
 
 @fastmath function fasten_main(
