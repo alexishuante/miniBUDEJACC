@@ -257,6 +257,8 @@ function main()
   end
 
   @printf "Largest difference was %.03f%%.\n\n" 100 * maxdiff # Expect numbers to be accurate to 2 decimal places
+  # The reference energies are pre-computed values that are considered "correct" or "expected" for the given molecular configurations.
+  # its located here ref_energies = open("src/data/bm1/ref_energies.out", "r")
   close(ref_energies)
 
 end

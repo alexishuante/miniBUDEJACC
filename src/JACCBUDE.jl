@@ -1,16 +1,35 @@
+# IMPORTANT NOTES
+
+#TODO: Update github repository on how to run the code: DONE
+#Compare apples to apples
+#Start with the threads version always for code translation to JACC
+#TODO: Check its using elapsed correctly: DONE
+#TODO: Print the time: DONE
+#TODO: Make sure the code is using the CUDA device: DONE
+#TODO: First compare the original versions CUDA vs Threads vs AMDGPU
+# We cannot have different if statements (only one function for the kernel)
+# Check I have access to Frontier and play with mi250x
+
+
+
 import JACC
 import Pkg
 using Test
 using StaticArrays
 include("BUDE.jl")
 
-# set backend
+
+# set backend (the only if statement)
 include("BasicBUDEPreferences.jl")
 @static if endswith(BasicBUDEPreferences.backend, "cuda")
     # @TODO Julia Pkg.add will add target = :weakdeps in later versions
     Pkg.add(; name = "CUDA", version = "v5.1.1")
     import CUDA
     println("Using CUDA as back end")
+
+    device = CUDA.device()
+    println("device: $(CUDA.name(device))")
+
 elseif endswith(BasicBUDEPreferences.backend, "amdgpu")
     Pkg.add(; name = "AMDGPU", version = "v0.8.6")
     import AMDGPU
@@ -55,39 +74,53 @@ function run(params::Params, deck::Deck) #_::DeviceWithRepr)
     etotals,
   )
 
-  elapsed = @elapsed for _ = 1:params.iterations
-    fasten_main(
-      Val(convert(Int, params.wgsize)),
-      protein,
-      ligand,
-      forcefield,
-      poses,
-      etotals,
-    )
+  # ORIGINAL ELAPSED FROM THREADED.JL
+
+  # elapsed = @elapsed for _ = 1:params.iterations
+  #   fasten_main(
+  #     Val(convert(Int, params.wgsize)),
+  #     protein,
+  #     ligand,
+  #     forcefield,
+  #     poses,
+  #     etotals,
+  #   )
+  # end
+
+
+  #MODIFIED ELAPSED FROM THREADED.JL
+
+  total_elapsed = 0.0
+  for i = 1:params.iterations
+    start_time = time()
+    begin
+      fasten_main(
+        Val(convert(Int, params.wgsize)),
+        protein,
+        ligand,
+        forcefield,
+        poses,
+        etotals,
+      )
+    end
+    end_time = time()
+    iteration_elapsed = end_time - start_time
+    total_elapsed += iteration_elapsed
+    println("Iteration $(i): $(iteration_elapsed) seconds")
   end
 
-  # # Use @time for timing
-  #   time_result = @timed begin
-  #     for _ = 1:params.iterations
-  #       fasten_main(
-  #         Val(convert(Int, params.wgsize)),
-  #         protein,
-  #         ligand,
-  #         forcefield,
-  #         poses,
-  #         etotals,
-  #       )
-  #     end
-  #   end
+  average_time = total_elapsed / params.iterations
+  println("Total elapsed time: $(total_elapsed) seconds")
+  println("Average time per iteration: $(average_time) seconds")
   
-  # elapsed = time_result.time
 
   # Transfer etotals back to CPU
   etotals_cpu = Array(etotals)
 
   
   #(etotals, elapsed, params.wgsize)
-  (etotals_cpu, elapsed, params.wgsize)
+  #(etotals_cpu, elapsed, params.wgsize)
+  (etotals_cpu, total_elapsed, params.wgsize)
 end
 
 @fastmath function fasten_main(
@@ -103,7 +136,6 @@ end
   nligand::Int = length(ligand)
   nprotein::Int = length(protein)
 
-  # print numgroups
   #Threads.@threads for group = 1:numGroups (use a function instead)
   function kernel(group, protein, ligand, forcefield, poses, etotals)
 
