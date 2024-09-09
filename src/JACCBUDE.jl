@@ -8,7 +8,7 @@
 #TODO: Make sure the code is using the CUDA device: DONE
 #TODO: First compare the original versions CUDA vs Threads vs AMDGPU
 # We cannot have different if statements (only one function for the kernel)
-# Check I have access to Frontier and play with mi250x
+# Check I have access to Frontier and play with mi250x in the future
 
 
 
