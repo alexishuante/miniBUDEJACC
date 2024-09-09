@@ -68,6 +68,7 @@ function run(params::Params, deck::Deck) #_::DeviceWithRepr)
   etotals = JACC.Array{Float32}(undef, size(deck.poses)[2])
 
 
+
   # warmup
   fasten_main(
     Val(convert(Int, params.wgsize)),
@@ -93,7 +94,6 @@ function run(params::Params, deck::Deck) #_::DeviceWithRepr)
 
 
   #MODIFIED ELAPSED FROM THREADED.JL
-
   total_elapsed = 0.0
   for i = 1:params.iterations
     start_time = time()
