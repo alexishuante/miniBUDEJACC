@@ -4,6 +4,7 @@ authors = ["Alexis Huante <alexis.huante@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"

@@ -6,4 +6,4 @@ version = "11.4"
 backend = "cuda"
 
 [miniBUDEJACC]
-backend = "jacc-cuda"
+backend = "jacc-threads"

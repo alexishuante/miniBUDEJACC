@@ -34,6 +34,10 @@ elseif endswith(BasicBUDEPreferences.backend, "amdgpu")
     Pkg.add(; name = "AMDGPU", version = "v0.8.6")
     import AMDGPU
     println("Using AMDGPU as back end")
+    
+    device = AMDGPU.device()
+    println("device: $device")
+
   elseif endswith(BasicBUDEPreferences.backend, "threads")
     println("Using threads as back end")
 end
@@ -130,7 +134,10 @@ end
   forcefield::JACC.Array{FFParams},
   poses::JACC.Array{Float32,2},
   etotals::JACC.Array{Float32},
-) where {WGSIZE}
+) where {WGSIZE} #wgsize can be any type, but it must be specified when the function is called 
+# can be called like this fasten_main(Val(64), protein, ligand, forcefield, poses, etotals) which means work group size of 64.
+
+  #local variables
   nposes::Int = size(poses)[2]
   numGroups::Int = nposes ÷ WGSIZE
   nligand::Int = length(ligand)
